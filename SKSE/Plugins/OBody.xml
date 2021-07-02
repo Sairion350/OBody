@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Valid Bodyparts: Breasts, Butt, Waist
+    Values should be 0 through 9
+    9 = prefer large. 4 = prefer mid-size. 0 = prefer small.
+    -1 means no preference / random like the default
+    More races can be added. Use their CK names
+    Set enable value to 1 too
+-->
+
+<Enable value="0"/>
+<Races>
+    <Race name="Nord" breasts="-1" butt="-1"/>
+    <Race name="Orc" butt="-1"/>
+</Races>

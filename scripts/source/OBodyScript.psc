@@ -1,151 +1,128 @@
 ScriptName OBodyScript extends Quest
 
-
 bool Property ORefitEnabled
 	bool Function Get()
-		return (game.GetFormFromFile(0x001802, "OBody.esp") as GlobalVariable).GetValueInt() == 1
+		Return (Game.GetFormFromFile(0x001802, "OBody.esp") as GlobalVariable).GetValueInt() == 1
 	EndFunction
 EndProperty
 
 bool Property NippleRandEnabled
 	bool Function Get()
-		return (game.GetFormFromFile(0x001803, "OBody.esp") as GlobalVariable).GetValueInt() == 1
+		Return (Game.GetFormFromFile(0x001803, "OBody.esp") as GlobalVariable).GetValueInt() == 1
 	EndFunction
 EndProperty
 
 bool Property GenitalRandEnabled
 	bool Function Get()
-		return (game.GetFormFromFile(0x001804, "OBody.esp") as GlobalVariable).GetValueInt() == 1
+		Return (Game.GetFormFromFile(0x001804, "OBody.esp") as GlobalVariable).GetValueInt() == 1
 	EndFunction
 EndProperty
 
 int Property PresetKey
 	int Function Get()
-		return (game.GetFormFromFile(0x001805, "OBody.esp") as GlobalVariable).GetValueInt()
+		Return (Game.GetFormFromFile(0x001805, "OBody.esp") as GlobalVariable).GetValueInt()
 	EndFunction
 EndProperty
 
+Actor PlayerRef
 
-
-actor playerref
-
-Actor Property targetOrPlayer
+Actor Property TargetOrPlayer
 	Actor Function Get()
-		actor ret
-		ret = game.GetCurrentCrosshairRef() as actor
+		Actor ret = Game.GetCurrentCrosshairRef() as Actor
 
-		if ret == none 
-			ret = playerref
-		endif 
+		If !ret
+			ret = PlayerRef
+		EndIf
 
-		return ret
+		Return ret
 	EndFunction
 EndProperty
 
 Event OnInit()
-	playerref = game.GetPlayer()
-	debug.Notification("OBody installed")
-	Debug.Notification(OBodyNative.GetFemaleDatabaseSize() + " female bodyslide presets installed")
-	Debug.Notification(OBodyNative.GetMaleDatabaseSize() + " male bodyslide presets installed")
-
-
-	onload()
+	PlayerRef = Game.GetPlayer()
+	Int femaleSize = OBodyNative.GetFemaleDatabaseSize()
+	Int maleSize = OBodyNative.GetMaleDatabaseSize()
+	Debug.Notification("OBody Installed: [F: " + femaleSize + "] [M: " + maleSize + "]")
+	OnLoad()
 EndEvent
 
 Function OnLoad()
 	RegisterForKey(PresetKey)
-
 	OBodyNative.SetORefit(ORefitEnabled)
 	OBodyNative.SetNippleRand(NippleRandEnabled)
 	OBodyNative.SetGenitalRand(GenitalRandEnabled)
-
 EndFunction
-
 
 Event OnKeyDown(int KeyPress)
 	If (Utility.IsInMenuMode() || UI.IsMenuOpen("console"))
 		Return
 	EndIf
-	
-	if KeyPress == PresetKey 
-		ShowPresetMenu(targetOrPlayer)
+
+	if KeyPress == PresetKey
+		ShowPresetMenu(TargetOrPlayer)
 	endif
 EndEvent
 
 Function ShowPresetMenu(Actor act)
-
-	debug.Notification("Editing " + act.GetDisplayName())
-	UIListMenu listmenu = uiextensions.GetMenu("UIListMenu") as UIListMenu
-	listmenu.ResetMenu()
+	Debug.Notification("Editing " + act.GetDisplayName())
+	UIListMenu listMenu = UIExtensions.GetMenu("UIListMenu") as UIListMenu
+	listMenu.ResetMenu()
 
 	string[] title = new String[1]
-	title[0] = "-   OBody   -"
+	title[0] = "-   OBody    -"
 
 	string[] presets = OBodyNative.GetAllPossiblePresets(act)
 	int l = presets.Length
-	console((l) + " presets found")
+	Console((l) + " presets found")
 
 	int pagesNeeded
-	if l > 125
+	If l > 125
 		pagesNeeded = (l / 125) + 1
-		console("Pages needed: " + pagesneeded)
+		;Console("Pages needed: " + pagesNeeded)
 
 		int i = 0
-
-		while i < pagesNeeded
-			listmenu.AddEntryItem("OBody set " + (i + 1))
+		While i < pagesNeeded
+			listMenu.AddEntryItem("OBody set " + (i + 1))
 			i += 1
 		EndWhile
 
-		listmenu.OpenMenu(act)
-		int num = listmenu.GetResultInt()
-		if num < 0
-			return 
-		endif
+		listMenu.OpenMenu(act)
+		int num = listMenu.GetResultInt()
+		If num < 0
+			Return
+		EndIf
 
 		int startingPoint = num * 125
-
 		int endPoint
-
-		if num == (pagesNeeded - 1) ; last set
-			endPoint = presets.Length - 1 
-		else 
+		If num == (pagesNeeded - 1) ; last set
+			endPoint = presets.Length - 1
+		Else
 			endPoint = startingPoint + 124
-		endif 
+		EndIf
 
-		listmenu.ResetMenu()
+		listMenu.ResetMenu()
 		presets = PapyrusUtil.SliceStringArray(presets, startingPoint, endPoint)
-
-	endif 
+	EndIf
 
 	presets = PapyrusUtil.MergeStringArray(title, presets)
 
-
 	int i = 0
 	int max = presets.length
-	
-	while (i < max)
-		listmenu.AddEntryItem( presets[i])
-
+	While (i < max)
+		listMenu.AddEntryItem(presets[i])
 		i += 1
-	endwhile
+	EndWhile
 
-	listmenu.OpenMenu(act)
-	string result = listmenu.GetResultString()
+	listMenu.OpenMenu(act)
+	string result = listMenu.GetResultString()
 
-	int num = listmenu.GetResultInt()
-
-	if !(num < 1)
+	int num = listMenu.GetResultInt()
+	If !(num < 1)
 		OBodyNative.ApplyPresetByName(act, result)
-		console("Applying: " + result)
-	endif 
-
+		Console("Applying: " + result)
+	EndIf
 EndFunction
 
-
-
-
-function console(string in)	
-	OsexIntegrationMain.Console(in)
+Function Console(String in)
+	MiscUtil.PrintConsole("OBody: " + in)
 EndFunction
-
