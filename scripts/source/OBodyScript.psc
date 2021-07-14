@@ -1,5 +1,7 @@
 ScriptName OBodyScript extends Quest
 
+import outils 
+
 bool Property ORefitEnabled
 	bool Function Get()
 		Return (Game.GetFormFromFile(0x001802, "OBody.esp") as GlobalVariable).GetValueInt() == 1
@@ -43,6 +45,10 @@ Event OnInit()
 	Int femaleSize = OBodyNative.GetFemaleDatabaseSize()
 	Int maleSize = OBodyNative.GetMaleDatabaseSize()
 	Debug.Notification("OBody Installed: [F: " + femaleSize + "] [M: " + maleSize + "]")
+
+	OUtils.getOStim().RegisterForGameLoadEvent(self)
+	RegisterForOUpdate(self)
+
 	OnLoad()
 EndEvent
 
@@ -52,6 +58,10 @@ Function OnLoad()
 	OBodyNative.SetNippleRand(NippleRandEnabled)
 	OBodyNative.SetGenitalRand(GenitalRandEnabled)
 EndFunction
+
+Event OnGameLoad()
+	OnLoad()
+EndEvent
 
 Event OnKeyDown(int KeyPress)
 	If (Utility.IsInMenuMode() || UI.IsMenuOpen("console"))
@@ -121,8 +131,4 @@ Function ShowPresetMenu(Actor act)
 		OBodyNative.ApplyPresetByName(act, result)
 		Console("Applying: " + result)
 	EndIf
-EndFunction
-
-Function Console(String in)
-	MiscUtil.PrintConsole("OBody: " + in)
 EndFunction
