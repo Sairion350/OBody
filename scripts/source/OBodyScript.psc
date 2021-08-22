@@ -64,7 +64,7 @@ Event OnGameLoad()
 EndEvent
 
 Event OnKeyDown(int KeyPress)
-	If (Utility.IsInMenuMode() || UI.IsMenuOpen("console"))
+	If outils.MenuOpen()
 		Return
 	EndIf
 

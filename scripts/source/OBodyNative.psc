@@ -10,6 +10,8 @@ Function ApplyPresetByName(Actor a_actor, String a_name) Global Native
 
 Function RegisterForOBodyEvent(Quest a_quest) Global Native
 
+Function RegisterForOBodyNakedEvent(Quest a_quest) Global Native
+
 Function MarkForReprocess(Actor a_actor) Global
 	NiOverride.SetBodyMorph(a_actor, "obody_processed", "OBody", 0.0)
 EndFunction
